@@ -1,17 +1,23 @@
-# Use the official Nginx image as the base image
-FROM nginx:stable-alpine
+# Use the official Node.js image as the base image
+FROM node:16.17.0-alpine
 
 # Set the working directory inside the container
-WORKDIR /usr/share/nginx/html
+WORKDIR /app
 
-# Remove the default Nginx static files
-RUN rm -rf ./*
+# Copy package.json and yarn.lock (or package-lock.json) files
+COPY package.json yarn.lock ./
 
-# Copy the static website files from your local machine to the container
+# Install dependencies
+RUN yarn install
+
+# Copy the rest of the application code
 COPY . .
 
-# Expose port 80
-EXPOSE 80
+# Set environment variables
+ENV NODE_ENV=production
 
-# Start Nginx when the container launches
-CMD ["nginx", "-g", "daemon off;"]
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Command to run the application
+CMD ["node", "index.js"]
